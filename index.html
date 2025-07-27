@@ -18,9 +18,6 @@
             background-size: 400% 400%;
             animation: gradientFlow 15s ease infinite;
             overflow-x: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         @keyframes gradientFlow {
@@ -39,10 +36,15 @@
             box-shadow: none; /* 在移动设备上不需要阴影 */
             display: flex;
             flex-direction: column;
-            border: 2px solid red; /* 调试边框 */
         }
 
         @media (min-width: 450px) {
+            html, body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
             .iphone-container {
                 height: 932px;
                 border-radius: 55px;
@@ -59,7 +61,6 @@
             overflow: hidden;
             position: relative;
             flex-grow: 1;
-            border: 2px solid blue; /* 调试边框 */
         }
 
         .status-bar {
@@ -138,7 +139,6 @@
             position: relative;
             z-index: 1;
             box-sizing: border-box; /* Ensure padding is included in height calculation */
-            border: 2px solid green; /* 调试边框 */
         }
 
         .bottom-nav {
