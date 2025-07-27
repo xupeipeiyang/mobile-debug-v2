@@ -3,26 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>调试页面</title>
+    <title>调试页面 - 迁移测试</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: sans-serif;
+            box-sizing: border-box;
         }
-        .container {
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(-45deg, #2563EB, #3B82F6, #60A5FA, #93C5FD);
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .iphone-container {
             width: 100%;
-            max-width: 430px; /* 限制最大宽度 */
-            margin: 0 auto; /* 居中 */
-            border: 1px solid #ccc;
-            padding: 10px;
+            max-width: 430px; /* 保持最大宽度以适应桌面浏览器 */
+            height: 100vh; /* 占满整个视口高度 */
+            background: #1C1C1E;
+            border-radius: 0; /* 在移动设备上不需要圆角 */
+            padding: 0; /* 在移动设备上不需要内边距 */
+            box-shadow: none; /* 在移动设备上不需要阴影 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 450px) {
+            .iphone-container {
+                height: 932px;
+                border-radius: 55px;
+                padding: 8px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            }
+        }
+
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            background: #F8FAFC; /* --bg-primary */
+            border-radius: 0; /* No radius on mobile */
+            overflow: hidden;
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .status-bar {
+            display: flex; /* Always show */
+            height: 44px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E293B; /* --text-primary */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #F8FAFC; /* --bg-primary */
+            z-index: 1002;
+            border-radius: 0;
+            box-sizing: border-box;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .signal-icon {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 12px;
+        }
+
+        .signal-bar {
+            width: 3px;
+            background: #1E293B; /* --text-primary */
+            border-radius: 1px;
+        }
+
+        .signal-bar:nth-child(1) { height: 3px; }
+        .signal-bar:nth-child(2) { height: 6px; }
+        .signal-bar:nth-child(3) { height: 9px; }
+        .signal-bar:nth-child(4) { height: 12px; }
+
+        .dynamic-island {
+            display: flex; /* Always show */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 126px;
+            height: 37px;
+            background: #1C1C1E;
+            border-radius: 19px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+            z-index: 1003;
+        }
+
+        @media (min-width: 450px) {
+            .iphone-screen {
+                border-radius: 47px;
+            }
+        }
+
+        .main-content {
+            height: calc(100% - 83px); /* Adjusted for nav bar */
+            overflow-y: auto;
+            padding: 20px;
+            padding-top: 44px; /* Space for status bar */
+            padding-bottom: 100px; /* Space for nav bar */
+            min-height: 0;
+            position: relative;
+            z-index: 1;
+            box-sizing: border-box; /* Ensure padding is included in height calculation */
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 83px;
+            background: rgba(249, 250, 251, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 10px;
+            z-index: 1000;
+        }
+
+        .progress-section, .quick-actions, .daily-tasks {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .daily-tasks h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: var(--accent-color);
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            background-color: currentColor;
+            margin-bottom: 4px;
+            border-radius: 6px; /* Placeholder for icon */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>这是一个测试页面</h1>
-        <p>如果这个页面在您的手机上正常显示（居中且有边框），那么问题就出在原文件的复杂样式中。</p>
+    <div class="iphone-container">
+        <div class="iphone-screen">
+            <div class="status-bar">
+                <div class="time">9:41</div>
+                <div class="dynamic-island">
+                </div>
+                <div class="status-right">
+                    <div class="signal-icon">
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                    </div>
+                    <div class="wifi-icon"></div>
+                    <div class="battery-icon"></div>
+                </div>
+            </div>
+            <div class="main-content" id="main-content">
+                <div id="home-screen">
+                    <div class="progress-section">
+                        <!-- Progress content here -->
+                    </div>
+                    <div class="quick-actions">
+                        <!-- Quick actions here -->
+                    </div>
+                    <div class="daily-tasks">
+                        <!-- Daily tasks here -->
+                    </div>
+                </div>
+                <div id="study-screen" style="display:none;">
+                    <!-- Study screen content -->
+                </div>
+                <div id="forum-screen" style="display:none;">
+                    <!-- Forum screen content -->
+                </div>
+                <div id="profile-screen" style="display:none;">
+                    <!-- Profile screen content -->
+                </div>
+            </div>
+            <nav class="bottom-nav">
+                <div class="nav-item active" data-screen="home-screen">
+                    <div class="nav-icon"></div>
+                    <span>首页</span>
+                </div>
+                <div class="nav-item" data-screen="study-screen">
+                    <div class="nav-icon"></div>
+                    <span>学习</span>
+                </div>
+                <div class="nav-item" data-screen="forum-screen">
+                    <div class="nav-icon"></div>
+                    <span>论坛</span>
+                </div>
+                <div class="nav-item" data-screen="profile-screen">
+                    <div class="nav-icon"></div>
+                    <span>我的</span>
+                </div>
+            </nav>
+        </div>
     </div>
 </body>
 </html>
